@@ -1,0 +1,3 @@
+If there are no rows found, you need to run a error method 
+It's not handling updating connection flights properly
+Clean main.py

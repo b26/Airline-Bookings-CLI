@@ -1,0 +1,84 @@
+Mini-Project 1 Design Document
+
+GENERAL OVERVIEW
+Our program allows the user to search a premade database for flights on a certain date from a specific location headed to a specific destination. If you mispell the source of the flight or destination, the program will reccommend cities with similiar names. You must have at entered at least 4  letters for this to work. Flights are ordered by price, but can be ordered by number of stops as well.
+
+Any user can book flights. They can book flights under multiple names. These bookings are organized by passenger name and country. Special users called agents can do everything a normal user can do but they can also update the actual departure time, and actual arrival time of a flight.
+
+New users can be created, and will be prompted for an email address and a password. From there they can search for flights, create bookings, and cancel bookings like any other user.
+
+The program contains four different files:
+1. main.py - This is where you would run the application and also makes our
+connection to Oracle.
+2. app.py - Is a class and includes everything the user is able to do. Comments are included for all methods in the class.
+3. methods.py - This file contains all the methods we need in order to run the application.
+methods.py is used by app.py. Comments are included for all the methods. 
+4. views.sql - Includes three views: available_flights, good_connections and search_flights. We only
+use search_flights for this application.
+
+In order for the program to work properly, you need load the tables and also views.sql which will automatically create three new views that our program uses. This only needs to be done once.
+
+USER GUIDE
+When using this program you will initially be given a screen with 3 options. Login, Register, and Exit. You select which option you would like by entering the number associated with that option. Login and Register will prompt you for your email address and associated password. Once a correct input has been entered, you are brought to the next menu. Again, you select the desired
+option by typing in the number or letter associated with it and pressing enter. Exit exits the program.
+
+Search for flights then asks for the source of the flight you wish to look for and the asks for the destination of the flight you are looking for. It then asks for what day the flight is leaving on. Once you enter the Year, month, and day it asks if you want it to be sorted by the number of stops. If you did not specify the airport code, it will ask which airport is correct. It then
+displays the number of flights ordered by price. To book a flight, type in the associated row number. It will then ask for the name and country the flight is being booked under. Once those are entered, you should be returned to the previous menu.
+
+Round flights asks for the source of the flight you wish to look for and the asks for the destination of the flight you are looking for. It then asks for what day the flight is leaving on. Once you enter the year, month, and day it asks for the year, month and day you will be returning on. It then
+displays the number of flights ordered by the summed price. To book a flight, type in the associated row number. It will then ask for the name and country the flight is being booked under. Once those are entered, you should be returned to the previous menu.
+
+List existing bookings displays all bookings booked by that user. You can select a booking by typing in it's associated number to recieve additional details about that booking. Afterwards you return to the previous menu.
+
+Cancel a booking asks for what name the booking is booked under. Once that is given, it displays all bookings under that name. You can select a booking by typing in the number associated with it (the number on the left most column.) Once you do that it cancels the booking and you return to the previous menu.
+
+Exit logs you out, recording the time you logged out at, and exits the program.
+
+Agents have two additional options when they log in, the option to update a flight's arrival or departure. When they update a flight they are asked for their current location. The program then looks for flights that are supposed to be arriving and asks which one needs to be updated. Then depending on if you chose to update arrival or departure, the actual departure/arrival time is
+updated to the current time.
+
+SOFTWARE DESIGN
+
+The main function calls the app class which is set up,so the program keeps running until it recieves a '3' or an invalid input which triggers if loops that runs the exit command. If loops determine if the input is one of the three options and which method to call. If the input is not one of the three options, an else loop will catch the response and return 'Invalid Input. Exiting
+program'
+
+In the login screen '1' searches for an existing email via a select call to SQL and also checks if the email exists in the airline agents table. '2' simply adds a new email and password to the emails table. Afterwards it moves to the next menu and provides more options.
+
+In the user screen '1' triggers the search method. Once the inputs have been entered the program uses an if loop to detect if you want to sort by number of stops. A 'y' or 'yes' will cause it to sort by price and number of stops. 
+Anything else causes it to sort by price. If you didn't put in the airport code directly and had an input with a length greater then 3, the method will search for airports using the like function and then display all of the airports with similar names and asks for which one is correct. If an invalid input is selected, the program will inform you and default to the first offered option.
+If no similar airports are detected, the programs says so and still attempts to look for flights. Once the flights are displayed, an if loop detects if the user wants to book a flight by reading which row is associated with the inputed digit. If a invalid result is inputed, the program returns to the previous menu. If no flights are detected it informs that you can return to the user menu with any key.
+
+A valid input will cause the booking method to run. It automatically detects the email of the user, and asks for what name the ticket will be under. It then creates a large random number to use as a ticket number. This number may not be unique, but likely will not be due to the large range used for the random numbers. The result is then inserted into the table.  
+
+The booking will ask for a name for it to be listed under, which will be run under the passenger method. The passenger method simply searches to see if the passenger exists, and if not, creates a new passenger under that name with an associated country.
+
+The booking will also call the ticket method, which simply takes the information generated and inserts it into the tickets table.
+
+User menu '2' causes a round trip search. This operates like a normal search but it also looks for flights returning to the original source at a specified date It sums up the price of both flights and displays them in descending order.
+
+User menu '3' searches the table for bookings associated with the current user's email. It then uses an if loop to see if you want more details, or if you want to return back to the previous menu.
+
+User menu '4' asks for a name and searches the table for bookings associated with that name. It then uses an if loop to see if you want to delete a booking or return back to the previous menu.
+
+Typing 'E' will run the logout method which will create a timestamp of when the user logged out and returns to the first menu.
+
+If the user is an agent, the app function discovers it by having a special if loop to see if email given matches the email of an agent. This opens a special menu for the agent which gives access to updating arrivals and departures, '5' and '6' respectively.
+
+The update method uses an if loop to demand where the agent is currently located. It then compares that to the src and dst of each flight at that location. When it finds if it's the src or dst it then updates the arrival or departure time of the flight selected by the agent. The updated
+time is the current system time.
+
+TESTING STRATEGY
+
+First we tested if things are working like they are supposed to. We would create a new user, log out, and then log back in under that user. We then would search for flights on a specific known date, and book one of those flights. Then we would look up that booking, get the details, and then delete it. We would do this everytime we made a major change to the code of the program. When we got multiple errors from what we were supposed to get we would manually look up what were supposed to get. We would look at each incorrect result, figure out why we got that result, and how to get the result we wanted. Then we would move onto the next incorrect result.
+
+Then we would come up with theoretical errors that our code might have due to wrong inputs being put in. We would then write a fix for that error (usually a if loop to detect and avoid it). Which would then be tested by the above process, but instead we would deliberately put the wrong input in to see if our error catching was working.
+
+Finally we tried to implement the extra task. We decided on booking round trips. First we inserted data into the tables so we would know what the result was supposed to be. We tried writing the code needed to complete the task in question, and would get a wrong result. We would then go back to our code, try and figure out what why we got the result we did, and what we would need to do in order to get the result we wanted.
+
+GROUP WORK STRATEGY
+
+We mostly worked together on everything, and we weren't really keeping track of how long every task took. We simply sat at adjacent terminals in the labs and would each work on the same code, trying to get results, looking things up and helping each other with what problems we found.
+
+Since we worked in person, we would simply talk to each other to coordinate. We would arrange times to work together via text message.
+
+
